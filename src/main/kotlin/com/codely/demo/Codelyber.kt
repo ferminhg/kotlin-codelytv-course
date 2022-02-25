@@ -1,15 +1,36 @@
 package com.codely.demo
 
 import java.time.LocalDate
+import java.time.Period
+import kotlin.system.exitProcess
 
 fun main() {
     println("Please enter a date <yyyy-MM-dd>")
-    val readLine: String? = null
-    val input = LocalDate.parse(readLine ?: "1982-11-21")
-    readLine?.let {
-        val output = LocalDate.parse(it)
-        println("You entered: $output")
+
+    supportNullableString(readLine()).takeUnless {
+        it.isNullOrEmpty() || it.isNullOrBlank()
+    }?.let {
+        LocalDate.parse(it)
+    }.apply {
+        if (this == null) {
+            println("Invalid date")
+            exitProcess(1)
+        }
+    }?.also { input ->
+        println("You wrote $input")
+    }?.run {
+        calculateDifference()
     }
-//    val input = LocalDate.parse(readLine!!) // el !! es para que no sea null
-    println("You wrote $input ${input.dayOfWeek}")
+}
+
+fun supportNullableString(line: String?) = line
+
+private fun LocalDate.calculateDifference() = with(Period.between(this, LocalDate.now())) {
+    when {
+        years < 18 -> println("You are too young")
+        years > 0 -> println("You are $years years old")
+        months > 0 -> println("You are $months months old")
+        days > 0 -> println("You are $days days old")
+        else -> println("You are the same day")
+    }
 }
